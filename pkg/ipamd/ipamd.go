@@ -475,6 +475,7 @@ func (c *IPAMContext) nodeInit() error {
 		isTrunkENI := eni.ENIID == metadataResult.TrunkENI
 		isEFAENI := metadataResult.EFAENIs[eni.ENIID]
 		if !isTrunkENI && !c.disableENIProvisioning {
+			// TODO(bwagner5): Do we always need to tag ENIs?
 			if err := c.awsClient.TagENI(eni.ENIID, metadataResult.TagMap[eni.ENIID]); err != nil {
 				return errors.Wrapf(err, "ipamd init: failed to tag managed ENI %v", eni.ENIID)
 			}
@@ -538,6 +539,7 @@ func (c *IPAMContext) nodeInit() error {
 		vpcV4CIDRs = c.updateCIDRsRulesOnChange(vpcV4CIDRs)
 	}, 30*time.Second)
 
+	// TODO(bwagner5): Should be able to only do this if useCustomNetworking is enabled...
 	eniConfigName, err := eniconfig.GetNodeSpecificENIConfigName(ctx, c.cachedK8SClient)
 	if err == nil && c.useCustomNetworking && eniConfigName != "default" {
 		// Signal to VPC Resource Controller that the node is using custom networking
