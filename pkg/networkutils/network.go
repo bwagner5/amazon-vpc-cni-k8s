@@ -239,7 +239,7 @@ func (n *linuxNetwork) SetupRuleToBlockNodeLocalV4Access() error {
 	return n.setupRuleToBlockNodeLocalV4Access()
 }
 
-//Setup a rule to block traffic directed to v4 interface of the Pod
+// Setup a rule to block traffic directed to v4 interface of the Pod
 func (n *linuxNetwork) setupRuleToBlockNodeLocalV4Access() error {
 	ipt, err := n.newIptables(iptables.ProtocolIPv4)
 	if err != nil {
@@ -295,9 +295,21 @@ func (n *linuxNetwork) SetupHostNetwork(vpcv4CIDRs []string, primaryMAC string, 
 
 		if n.shouldConfigureRpFilter {
 			log.Debugf("Setting RPF for primary interface: %s", primaryIntfRPFilter)
-			err = n.procSys.Set(primaryIntfRPFilter, rpFilterLoose)
+			// check rp_filter first to see if it's required to be set
+			// since the "shouldConfigureRpFilter" flag also toggles whether the
+			// generic CNI plugins are installed in the entrypoint. Since the aws-node
+			// container does not operate in a privileged mode, this allows for a user to
+			// configure reverse path filtering outside of the CNI but stil configure the generic
+			// CNI plugins.
+			rpFilter, err := n.procSys.Get(primaryIntfRPFilter)
 			if err != nil {
-				return errors.Wrapf(err, "failed to configure %s RPF check", primaryIntf)
+				return errors.Wrapf(err, "failed pre-check when configuring %s RPF", primaryIntf)
+			}
+			if rpFilter != rpFilterLoose {
+				err = n.procSys.Set(primaryIntfRPFilter, rpFilterLoose)
+				if err != nil {
+					return errors.Wrapf(err, "failed to configure %s RPF check", primaryIntf)
+				}
 			}
 		} else {
 			log.Infof("Skip updating RPF for primary interface: %s", primaryIntfRPFilter)
