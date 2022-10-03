@@ -305,7 +305,9 @@ func (n *linuxNetwork) SetupHostNetwork(vpcv4CIDRs []string, primaryMAC string, 
 			if err != nil {
 				return errors.Wrapf(err, "failed pre-check when configuring %s RPF", primaryIntf)
 			}
+			log.Infof("PRECHECK FOR RPF: %s", rpFilter)
 			if rpFilter != rpFilterLoose {
+				log.Infof("CURRENT RPF %s does not equal %s", rpFilter, rpFilterLoose)
 				err = n.procSys.Set(primaryIntfRPFilter, rpFilterLoose)
 				if err != nil {
 					return errors.Wrapf(err, "failed to configure %s RPF check", primaryIntf)
