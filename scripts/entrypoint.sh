@@ -88,6 +88,9 @@ validate_env_var()
     fi
 }
 
+# Execute the init script which sets up the generic CNI plugins, reverse path filtering, etc.
+/app/init.sh
+
 # Check for all the required binaries before we go forward
 if [ ! -f aws-k8s-agent ]; then
     log_in_json error "Required aws-k8s-agent executable not found."
