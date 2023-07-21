@@ -1,0 +1,21 @@
+name: "aws-vpc-cni"
+compatibility:
+  - appVersion: v1.12.5
+    minK8sVersion: 1.26
+    maxK8sVersion: 1.27
+  - appVersion: v1.12.x
+    minK8sVersion: 1.25
+    maxK8sVersion: 1.25
+  - appVersion: v1.11.x
+    minK8sVersion: 1.24
+    maxK8sVersion: 1.25
+  - appVersion: v1.10.x
+    minK8sVersion: 1.24
+    maxK8sVersion: 1.24
+  - appVersion: v1.9.x
+    minK8sVersion: 1.24
+    maxK8sVersion: 1.24
+  - appVersion: v1.8.x
+    minK8sVersion: 1.22
+    maxK8sVersion: 1.23
+
